@@ -13,13 +13,27 @@ class BlogPost extends Model
     protected $fillable = [
         'title',
         'slug',
-        'content_raw',
-        'content_html',
-        'user_id',
-        'parent_id',
-        'description',
         'category_id',
+        'excerpt',
+        'content_raw',
         'is_published',
         'published_at',
+        'user_id',
     ];
+
+    /**
+     * Категорія статті
+     */
+    public function category()
+    {
+        return $this->belongsTo(\App\Models\BlogCategory::class);
+    }
+
+    /**
+     * Автор статті
+     */
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
 }

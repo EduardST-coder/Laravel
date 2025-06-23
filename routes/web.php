@@ -31,6 +31,6 @@ Route::prefix('admin/blog')->group(function () {
         ->names('blog.admin.categories');
 
     Route::resource('posts', AdminPostController::class)
-        ->only(['index', 'edit'])
+        ->except(['show']) // дозволяє index, edit, update, create, store, destroy
         ->names('blog.admin.posts');
 });

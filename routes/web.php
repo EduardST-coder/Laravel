@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Blog\PostController;
 use App\Http\Controllers\Blog\Admin\CategoryController;
+use App\Http\Controllers\Blog\Admin\PostController as AdminPostController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,14 +19,18 @@ Route::middleware([
     })->name('dashboard');
 });
 
-// CRUD для BlogPost
+// CRUD для публічних постів
 Route::prefix('blog')->group(function () {
     Route::resource('posts', PostController::class)->names('blog.posts');
 });
 
-// Адмінка категорій
+// Адмінка категорій і постів
 Route::prefix('admin/blog')->group(function () {
     Route::resource('categories', CategoryController::class)
         ->only(['index', 'edit', 'update', 'create', 'store'])
         ->names('blog.admin.categories');
+
+    Route::resource('posts', AdminPostController::class)
+        ->only(['index', 'edit'])
+        ->names('blog.admin.posts');
 });

@@ -2,22 +2,41 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\BlogPost;
+use App\Models\BlogCategory;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. Користувач із ID = 1
+        if (!User::where('id', 1)->exists()) {
+            User::factory()->create([
+                'id' => 1,
+                'name' => 'Admin',
+                'email' => 'admin@example.com',
+                'password' => bcrypt('123123'),
+            ]);
+        }
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // 2. Категорія з ID = 1
+        if (!BlogCategory::where('id', 1)->exists()) {
+            BlogCategory::create([
+                'id' => 1,
+                'title' => 'Default Category',
+                'slug' => 'default-category',
+                'parent_id' => 0,
+            ]);
+        }
+
+        // 3. Додаткові категорії (опціонально)
+        $this->call([
+            BlogCategoriesTableSeeder::class,
         ]);
+
+        // 4. Генерація постів
+        BlogPost::factory(100)->create();
     }
 }

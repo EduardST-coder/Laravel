@@ -8,6 +8,8 @@ use App\Http\Requests\BlogPostUpdateRequest;
 use App\Http\Requests\BlogPostCreateRequest;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
+use App\Jobs\BlogPostAfterCreateJob;
+use App\Jobs\BlogPostAfterDeleteJob;
 
 class PostController extends Controller
 {
@@ -40,6 +42,7 @@ class PostController extends Controller
         $item = (new BlogPost())->create($data);
 
         if ($item) {
+            BlogPostAfterCreateJob::dispatch($item);
             return redirect()
                 ->route('blog.admin.posts.edit', $item->id)
                 ->with(['success' => 'Успішно збережено']);
@@ -92,6 +95,7 @@ class PostController extends Controller
         $result = BlogPost::destroy($id);
 
         if ($result) {
+            BlogPostAfterDeleteJob::dispatch($id)->delay(now()->addSeconds(20));
             return redirect()
                 ->route('blog.admin.posts.index')
                 ->with(['success' => "Запис id[$id] видалено"]);

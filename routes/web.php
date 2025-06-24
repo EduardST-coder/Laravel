@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Blog\PostController;
 use App\Http\Controllers\Blog\Admin\CategoryController;
 use App\Http\Controllers\Blog\Admin\PostController as AdminPostController;
+use App\Http\Controllers\DiggingDeeperController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,6 +32,12 @@ Route::prefix('admin/blog')->group(function () {
         ->names('blog.admin.categories');
 
     Route::resource('posts', AdminPostController::class)
-        ->except(['show']) // дозволяє index, edit, update, create, store, destroy
+        ->except(['show'])
         ->names('blog.admin.posts');
+});
+
+// Лабораторна 11 — колекції
+Route::prefix('digging_deeper')->group(function () {
+    Route::get('collections', [DiggingDeeperController::class, 'collections'])
+        ->name('digging_deeper.collections');
 });

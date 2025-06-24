@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
-use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use App\Jobs\ProcessVideoJob;
+use App\Jobs\GenerateCatalog\GenerateCatalogMainJob;
 
 class DiggingDeeperController extends Controller
 {
@@ -26,8 +28,7 @@ class DiggingDeeperController extends Controller
         $result['where']['isEmpty'] = $result['where']['data']->isEmpty();
         $result['where']['isNotEmpty'] = $result['where']['data']->isNotEmpty();
 
-        $result['where_first'] = $collection
-            ->firstWhere('slug', '!=', '');
+        $result['where_first'] = $collection->firstWhere('slug', '!=', '');
 
         $result['map']['all'] = $collection->map(function ($item) {
             $newItem = new \stdClass();
@@ -42,7 +43,7 @@ class DiggingDeeperController extends Controller
             ->values()
             ->keyBy('item_id');
 
-        $transformed = $collection->map(function ($item) {
+        $collectionTransformed = $collection->map(function ($item) {
             $newItem = new \stdClass();
             $newItem->item_id = $item['id'] ?? null;
             $newItem->item_name = $item['title'] ?? null;
@@ -56,15 +57,15 @@ class DiggingDeeperController extends Controller
         $newItem2 = new \stdClass();
         $newItem2->id = 8888;
 
-        $newItemFirst = $transformed->prepend($newItem)->first();
-        $newItemLast = $transformed->push($newItem2)->last();
-        $pulledItem = $transformed->pull(1);
+        $newItemFirst = $collectionTransformed->prepend($newItem)->first();
+        $newItemLast = $collectionTransformed->push($newItem2)->last();
+        $pulledItem = $collectionTransformed->pull(1);
 
-        $filtered = collect(); // created_at видалено, тому фільтр умовний
+        $filtered = collect(); // created_at відсутній
 
         $sortedSimpleCollection = collect([5, 3, 1, 2, 4])->sort()->values();
-        $sortedAscCollection = $transformed->sortBy('item_name');
-        $sortedDescCollection = $transformed->sortByDesc('item_id');
+        $sortedAscCollection = $collectionTransformed->sortBy('item_name');
+        $sortedDescCollection = $collectionTransformed->sortByDesc('item_id');
 
         dd(compact(
             'result',
@@ -76,5 +77,15 @@ class DiggingDeeperController extends Controller
             'sortedAscCollection',
             'sortedDescCollection'
         ));
+    }
+
+    public function processVideo()
+    {
+        ProcessVideoJob::dispatch();
+    }
+
+    public function prepareCatalog()
+    {
+        GenerateCatalogMainJob::dispatch();
     }
 }

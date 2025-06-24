@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\Blog\Admin;
 
-// use App\Http\Controllers\Controller;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
 use App\Repositories\BlogCategoryRepository;
-use Illuminate\Support\Str;
 
 class CategoryController extends BaseController
 {
@@ -39,10 +37,6 @@ class CategoryController extends BaseController
     public function store(BlogCategoryCreateRequest $request)
     {
         $data = $request->input();
-
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
-        }
 
         $item = new \App\Models\BlogCategory($data);
         $result = $item->save();
@@ -80,10 +74,6 @@ class CategoryController extends BaseController
         }
 
         $data = $request->all();
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
-        }
-
         $result = $item->update($data);
 
         if ($result) {

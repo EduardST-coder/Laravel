@@ -3,20 +3,15 @@
 namespace App\Http\Controllers\Blog\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlogPost;
 use App\Http\Requests\BlogPostUpdateRequest;
+use App\Http\Requests\BlogPostCreateRequest;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 
 class PostController extends Controller
 {
-    /**
-     * @var BlogPostRepository
-     */
     private $blogPostRepository;
-
-    /**
-     * @var BlogCategoryRepository
-     */
     private $blogCategoryRepository;
 
     public function __construct()
@@ -29,6 +24,30 @@ class PostController extends Controller
     {
         $paginator = $this->blogPostRepository->getAllWithPaginate();
         return view('blog.admin.posts.index', compact('paginator'));
+    }
+
+    public function create()
+    {
+        $item = new BlogPost();
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
+
+        return view('blog.admin.posts.edit', compact('item', 'categoryList'));
+    }
+
+    public function store(BlogPostCreateRequest $request)
+    {
+        $data = $request->input();
+        $item = (new BlogPost())->create($data);
+
+        if ($item) {
+            return redirect()
+                ->route('blog.admin.posts.edit', $item->id)
+                ->with(['success' => 'Успішно збережено']);
+        } else {
+            return back()
+                ->withErrors(['msg' => 'Помилка збереження'])
+                ->withInput();
+        }
     }
 
     public function edit($id)
@@ -55,7 +74,6 @@ class PostController extends Controller
         }
 
         $data = $request->all();
-
         $result = $item->update($data);
 
         if ($result) {
@@ -66,6 +84,20 @@ class PostController extends Controller
             return back()
                 ->with(['msg' => 'Помилка збереження'])
                 ->withInput();
+        }
+    }
+
+    public function destroy($id)
+    {
+        $result = BlogPost::destroy($id);
+
+        if ($result) {
+            return redirect()
+                ->route('blog.admin.posts.index')
+                ->with(['success' => "Запис id[$id] видалено"]);
+        } else {
+            return back()
+                ->withErrors(['msg' => 'Помилка видалення']);
         }
     }
 }

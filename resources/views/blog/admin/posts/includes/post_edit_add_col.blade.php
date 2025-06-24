@@ -7,7 +7,9 @@
         </div>
     </div>
 </div>
+
 <br>
+
 @if ($item->exists)
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -18,7 +20,9 @@
             </div>
         </div>
     </div>
+
     <br>
+
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
@@ -27,10 +31,12 @@
                         <label>Створено</label>
                         <input type="text" value="{{ $item->created_at }}" class="form-control" disabled>
                     </div>
+
                     <div class="form-group">
                         <label>Змінено</label>
                         <input type="text" value="{{ $item->updated_at }}" class="form-control" disabled>
                     </div>
+
                     <div class="form-group">
                         <label>Опубліковано</label>
                         <input type="text" value="{{ $item->published_at }}" class="form-control" disabled>
